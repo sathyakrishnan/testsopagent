@@ -24,8 +24,9 @@ st.set_page_config(
 # Import Kevin AI
 try:
     from kevin_agents import MasterOrchestratorAgent
+    from export_utils import create_pdf_report, create_pptx_report
 except ImportError as e:
-    st.error(f"Failed to import kevin_agents: {e}")
+    st.error(f"Failed to import modules: {e}")
     st.stop()
 
 # Initialize session state
@@ -188,6 +189,55 @@ if st.session_state.current_session is not None:
         total_savings = sum(opp.get("estimated_savings_annual", 0) for opp in result.get("automation_opportunities", []))
         st.metric("Annual Savings", f"${total_savings:,.0f}")
     
+    # Export buttons
+    st.markdown("---")
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        if st.button("📄 Export PDF Report", use_container_width=True):
+            try:
+                pdf_path = f"kevin_ai_report_{result['session_id']}.pdf"
+                create_pdf_report(result, pdf_path)
+                with open(pdf_path, "rb") as f:
+                    st.download_button(
+                        "⬇️ Download PDF",
+                        f,
+                        file_name=pdf_path,
+                        mime="application/pdf",
+                        use_container_width=True
+                    )
+                os.remove(pdf_path)
+            except Exception as e:
+                st.error(f"Failed to create PDF: {e}")
+    
+    with col2:
+        if st.button("📊 Export PPTX Report", use_container_width=True):
+            try:
+                pptx_path = f"kevin_ai_report_{result['session_id']}.pptx"
+                create_pptx_report(result, pptx_path)
+                with open(pptx_path, "rb") as f:
+                    st.download_button(
+                        "⬇️ Download PPTX",
+                        f,
+                        file_name=pptx_path,
+                        mime="application/vnd.openxmlformats-officedocument.presentationml.presentation",
+                        use_container_width=True
+                    )
+                os.remove(pptx_path)
+            except Exception as e:
+                st.error(f"Failed to create PPTX: {e}")
+    
+    with col3:
+        # Export all as JSON
+        json_data = json.dumps(result, indent=2, default=str)
+        st.download_button(
+            "📦 Export JSON",
+            json_data,
+            file_name=f"kevin_ai_results_{result['session_id']}.json",
+            mime="application/json",
+            use_container_width=True
+        )
+    
     st.markdown("---")
     
     # Tabs for outputs
@@ -204,12 +254,47 @@ if st.session_state.current_session is not None:
         st.markdown("### Current State Process Map")
         if result.get('current_state_map'):
             st.code(result['current_state_map'], language='mermaid')
-            st.download_button(
-                "📥 Download Current State Map",
-                result['current_state_map'],
-                file_name=f"current_state_{result['session_id']}.mermaid",
-                mime="text/plain"
-            )
+            
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.download_button(
+                    "📥 Download Mermaid (.mermaid)",
+                    result['current_state_map'],
+                    file_name=f"current_state_{result['session_id']}.mermaid",
+                    mime="text/plain"
+                )
+            with col2:
+                if st.button("🖼️ Export as PNG", key="current_png"):
+                    try:
+                        from export_utils import mermaid_to_image
+                        png_path = f"current_state_{result['session_id']}.png"
+                        mermaid_to_image(result['current_state_map'], png_path, 'png')
+                        with open(png_path, "rb") as f:
+                            st.download_button(
+                                "⬇️ Download PNG",
+                                f,
+                                file_name=png_path,
+                                mime="image/png"
+                            )
+                        os.remove(png_path)
+                    except Exception as e:
+                        st.error(f"Error: {e}")
+            with col3:
+                if st.button("🖼️ Export as JPG", key="current_jpg"):
+                    try:
+                        from export_utils import mermaid_to_image
+                        jpg_path = f"current_state_{result['session_id']}.jpg"
+                        mermaid_to_image(result['current_state_map'], jpg_path, 'jpg')
+                        with open(jpg_path, "rb") as f:
+                            st.download_button(
+                                "⬇️ Download JPG",
+                                f,
+                                file_name=jpg_path,
+                                mime="image/jpeg"
+                            )
+                        os.remove(jpg_path)
+                    except Exception as e:
+                        st.error(f"Error: {e}")
         else:
             st.warning("No current state map available")
     
@@ -217,12 +302,47 @@ if st.session_state.current_session is not None:
         st.markdown("### Future State Process Map")
         if result.get('future_state_map'):
             st.code(result['future_state_map'], language='mermaid')
-            st.download_button(
-                "📥 Download Future State Map",
-                result['future_state_map'],
-                file_name=f"future_state_{result['session_id']}.mermaid",
-                mime="text/plain"
-            )
+            
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.download_button(
+                    "📥 Download Mermaid (.mermaid)",
+                    result['future_state_map'],
+                    file_name=f"future_state_{result['session_id']}.mermaid",
+                    mime="text/plain"
+                )
+            with col2:
+                if st.button("🖼️ Export as PNG", key="future_png"):
+                    try:
+                        from export_utils import mermaid_to_image
+                        png_path = f"future_state_{result['session_id']}.png"
+                        mermaid_to_image(result['future_state_map'], png_path, 'png')
+                        with open(png_path, "rb") as f:
+                            st.download_button(
+                                "⬇️ Download PNG",
+                                f,
+                                file_name=png_path,
+                                mime="image/png"
+                            )
+                        os.remove(png_path)
+                    except Exception as e:
+                        st.error(f"Error: {e}")
+            with col3:
+                if st.button("🖼️ Export as JPG", key="future_jpg"):
+                    try:
+                        from export_utils import mermaid_to_image
+                        jpg_path = f"future_state_{result['session_id']}.jpg"
+                        mermaid_to_image(result['future_state_map'], jpg_path, 'jpg')
+                        with open(jpg_path, "rb") as f:
+                            st.download_button(
+                                "⬇️ Download JPG",
+                                f,
+                                file_name=jpg_path,
+                                mime="image/jpeg"
+                            )
+                        os.remove(jpg_path)
+                    except Exception as e:
+                        st.error(f"Error: {e}")
         else:
             st.warning("No future state map available")
     

@@ -15,7 +15,8 @@ pydantic-settings==2.12.0
 # =============================================================================
 # UI FRAMEWORK
 # =============================================================================
-gradio==5.9.1
+streamlit==1.40.2
+# gradio==5.9.1  # Optional - use streamlit instead
 
 # =============================================================================
 # LANGCHAIN & AI
@@ -102,3 +103,10 @@ fsspec==2025.12.0
 
 # For API documentation
 markdown-it-py==4.0.0
+
+# Document Generation
+reportlab==4.2.5
+python-pptx==1.0.2
+
+# Mermaid to Image Conversion
+playwright==1.49.1
