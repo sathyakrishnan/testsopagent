@@ -244,13 +244,13 @@ Transform Standard Operating Procedures into intelligent, executable workflows w
             
             sop_file = gr.File(
                 label="📄 SOP Document",
-                file_types=[".pdf", ".docx", ".md", ".mermaid"],
+                file_types=[".pdf", ".docx"],
                 type="filepath"
             )
             
             diagram_file = gr.File(
                 label="📊 Process Diagram (Optional)",
-                file_types=[".png", ".jpg", ".jpeg", ".mermaid"],
+                file_types=[".png", ".jpg", ".jpeg"],
                 type="filepath"
             )
             
@@ -269,8 +269,8 @@ Transform Standard Operating Procedures into intelligent, executable workflows w
             gr.Markdown("""
 ---
 ### 📖 **Supported Formats**
-- **SOP:** PDF, DOCX, Mermaid
-- **Diagrams:** PNG, JPG, Mermaid
+- **SOP:** PDF, DOCX (Word documents)
+- **Diagrams:** PNG, JPG, JPEG (images)
 
 ### ⏱️ **Processing Time**
 - **Complete Analysis:** ~14 minutes
@@ -307,18 +307,18 @@ Upload an SOP document and click "Process SOP" to begin.
     
     with gr.Tabs():
         with gr.Tab("🗺️ Current State"):
-            current_state_output = gr.Code(
-                label="Current State Process Map (Mermaid)",
-                language="mermaid",
-                lines=20
+            current_state_output = gr.Textbox(
+                label="Current State Process Map (Mermaid Diagram)",
+                lines=20,
+                max_lines=30
             )
             export_current_btn = gr.Button("📥 Download Current State")
         
         with gr.Tab("🚀 Future State"):
-            future_state_output = gr.Code(
-                label="Future State Process Map (Mermaid)",
-                language="mermaid",
-                lines=20
+            future_state_output = gr.Textbox(
+                label="Future State Process Map (Mermaid Diagram)",
+                lines=20,
+                max_lines=30
             )
             export_future_btn = gr.Button("📥 Download Future State")
         
