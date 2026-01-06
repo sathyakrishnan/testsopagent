@@ -165,28 +165,131 @@ def create_pdf_report(result, output_path):
     story.append(PageBreak())
     
     # Automation Opportunities
-    story.append(Paragraph("Automation Opportunities", heading_style))
+    story.append(Paragraph("Automation Opportunities Matrix", heading_style))
     if automation_opps:
-        for i, opp in enumerate(automation_opps[:10], 1):  # Limit to first 10
-            story.append(Paragraph(f"<b>{i}. {opp.get('description', 'N/A')}</b>", styles['Normal']))
-            story.append(Paragraph(f"Type: {opp.get('automation_type', 'N/A')}", styles['Normal']))
-            story.append(Paragraph(f"Complexity: {opp.get('complexity', 'N/A')}", styles['Normal']))
-            story.append(Paragraph(f"Annual Savings: ${opp.get('estimated_savings_annual', 0):,.0f}", styles['Normal']))
-            story.append(Spacer(1, 0.1*inch))
+        # Create table data
+        table_data = [
+            ['ID', 'Stage', 'Activity', 'Type', 'Impact', 'Savings/Year', 'Priority']
+        ]
+        
+        for i, opp in enumerate(automation_opps, 1):
+            table_data.append([
+                f"AO-{i:02d}",
+                str(opp.get('step_id', 'N/A'))[:15],
+                str(opp.get('description', 'N/A'))[:40] + "...",
+                str(opp.get('automation_type', 'N/A'))[:15],
+                f"{opp.get('time_savings_hours_per_week', 0) * 2}%",
+                f"${opp.get('estimated_savings_annual', 0):,.0f}",
+                str(opp.get('priority', 'P2'))
+            ])
+        
+        opp_table = Table(table_data, colWidths=[0.5*inch, 0.8*inch, 2*inch, 1*inch, 0.6*inch, 1*inch, 0.6*inch])
+        opp_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1f77b4')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 9),
+            ('FONTSIZE', (0, 1), (-1, -1), 8),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ]))
+        
+        story.append(opp_table)
+        story.append(Spacer(1, 0.3*inch))
+        
+        # Summary by type
+        story.append(Paragraph("Automation by Type:", styles['Normal']))
+        automation_types = {}
+        for opp in automation_opps:
+            atype = opp.get('automation_type', 'Unknown')
+            automation_types[atype] = automation_types.get(atype, 0) + 1
+        
+        for atype, count in automation_types.items():
+            story.append(Paragraph(f"• {atype}: {count} opportunities", styles['Normal']))
+        
     else:
         story.append(Paragraph("No automation opportunities identified.", styles['Normal']))
     story.append(PageBreak())
     
     # Test Cases Summary
-    story.append(Paragraph("Test Cases Summary", heading_style))
+    story.append(Paragraph("Test Cases", heading_style))
     if test_cases:
-        story.append(Paragraph(f"Total test cases generated: {len(test_cases)}", styles['Normal']))
-        story.append(Spacer(1, 0.1*inch))
-        for i, test in enumerate(test_cases[:5], 1):  # Show first 5
-            story.append(Paragraph(f"<b>{i}. {test.get('test_name', 'N/A')}</b>", styles['Normal']))
-            story.append(Paragraph(f"Type: {test.get('test_type', 'N/A')}", styles['Normal']))
-            story.append(Paragraph(f"Priority: {test.get('priority', 'N/A')}", styles['Normal']))
+        # Test cases table
+        table_data = [
+            ['ID', 'Test Case', 'Type', 'Priority', 'Status']
+        ]
+        
+        for i, test in enumerate(test_cases[:20], 1):  # First 20
+            table_data.append([
+                f"TC-{i:02d}",
+                str(test.get('test_name', 'N/A'))[:50],
+                str(test.get('test_type', 'Functional')),
+                str(test.get('priority', 'Medium')),
+                'Auto-Ready' if test.get('automated', True) else 'Manual'
+            ])
+        
+        test_table = Table(table_data, colWidths=[0.6*inch, 3*inch, 1*inch, 0.8*inch, 1*inch])
+        test_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1f77b4')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 9),
+            ('FONTSIZE', (0, 1), (-1, -1), 8),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ]))
+        
+        story.append(test_table)
+        story.append(Spacer(1, 0.3*inch))
+        
+        # Detailed test cases (first 3)
+        story.append(PageBreak())
+        story.append(Paragraph("Detailed Test Case Examples", heading_style))
+        
+        for i, test in enumerate(test_cases[:3], 1):
+            story.append(Paragraph(f"<b>TC-{i:02d}: {test.get('test_name', 'N/A')}</b>", styles['Heading3']))
+            story.append(Paragraph(f"<b>Type:</b> {test.get('test_type', 'Functional')}", styles['Normal']))
+            story.append(Paragraph(f"<b>Priority:</b> {test.get('priority', 'Medium')}", styles['Normal']))
+            story.append(Paragraph(f"<b>Process Step:</b> {test.get('process_step', 'N/A')}", styles['Normal']))
             story.append(Spacer(1, 0.1*inch))
+            
+            story.append(Paragraph("<b>Description:</b>", styles['Normal']))
+            story.append(Paragraph(test.get('description', 'N/A'), styles['Normal']))
+            story.append(Spacer(1, 0.1*inch))
+            
+            story.append(Paragraph("<b>Pre-conditions:</b>", styles['Normal']))
+            preconditions = test.get('preconditions', ['System is available'])
+            for pc in preconditions:
+                story.append(Paragraph(f"• {pc}", styles['Normal']))
+            story.append(Spacer(1, 0.1*inch))
+            
+            story.append(Paragraph("<b>Test Steps:</b>", styles['Normal']))
+            test_steps = test.get('test_steps', ['Execute test'])
+            for j, step in enumerate(test_steps, 1):
+                story.append(Paragraph(f"{j}. {step}", styles['Normal']))
+            story.append(Spacer(1, 0.1*inch))
+            
+            story.append(Paragraph("<b>Expected Result:</b>", styles['Normal']))
+            story.append(Paragraph(test.get('expected_result', 'Test passes'), styles['Normal']))
+            story.append(Spacer(1, 0.2*inch))
+        
+        # Summary by type
+        story.append(Spacer(1, 0.2*inch))
+        story.append(Paragraph("Test Coverage Summary:", styles['Normal']))
+        test_types = {}
+        for test in test_cases:
+            ttype = test.get('test_type', 'Unknown')
+            test_types[ttype] = test_types.get(ttype, 0) + 1
+        
+        for ttype, count in test_types.items():
+            story.append(Paragraph(f"• {ttype}: {count} tests", styles['Normal']))
+        
     else:
         story.append(Paragraph("No test cases generated.", styles['Normal']))
     
