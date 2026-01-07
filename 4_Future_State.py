@@ -2,30 +2,23 @@
 Kevin AI - Future State Design Page
 Step 4: Side-by-side comparison of current vs optimized process
 
-Version: 4.0 - Pace UI
+Version: 4.1 - CSS Fixed
 Date: January 7, 2026
 """
 
 import streamlit as st
-import base64
 
-# Page config
-st.set_page_config(
-    page_title="Kevin AI - Future State Design",
-    page_icon="🎯",
-    layout="wide"
-)
+st.set_page_config(page_title="Kevin AI - Future State", page_icon="🎯", layout="wide")
 
-# Custom CSS
-st.markdown("""
+# Minimal CSS
+st.html("""
 <style>
-    .step-circle.completed { background: #00C853; color: white; }
-    .step-circle.active { background: #0066FF; color: white; }
-    .comparison-title { font-size: 32px; font-weight: 700; margin-bottom: 10px; }
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
 </style>
-""", unsafe_allow_html=True)
+""")
 
-# Progress Stepper
+# Progress
 st.markdown("### Step 4 of 6: Future State Design")
 st.progress(0.67)
 
@@ -59,6 +52,12 @@ with col1:
     - Sequential processing
     - 5% error rate
     - $35 cost per transaction
+    
+    **Issues:**
+    - Manual inventory checks (15 min)
+    - Sequential approvals (2-4 hrs wait)
+    - Manual data entry (5% errors)
+    - Email-based notifications
     """)
 
 with col2:
@@ -68,9 +67,15 @@ with col2:
     - 10 total steps (↓44%)
     - 2 manual touchpoints (↓83%)
     - 2.3 hour cycle time (↓45%)
-    - Parallel processing
+    - Parallel processing enabled
     - 0.5% error rate (↓90%)
     - $12 cost per transaction (↓66%)
+    
+    **Improvements:**
+    - Real-time API integration
+    - Automated routing & approvals
+    - AI-powered data validation
+    - System-triggered notifications
     """)
 
 # Key Changes
@@ -80,17 +85,19 @@ st.subheader("🔄 Key Transformations")
 col1, col2 = st.columns(2)
 with col1:
     st.markdown("**Steps Eliminated:**")
-    st.markdown("- ❌ Manual order review")
-    st.markdown("- ❌ Manual inventory lookup")
-    st.markdown("- ❌ Manual pick list creation")
-    st.markdown("- ❌ Email notifications")
+    st.markdown("- ❌ Manual order review (AI-powered)")
+    st.markdown("- ❌ Manual inventory lookup (API)")
+    st.markdown("- ❌ Manual pick list creation (auto)")
+    st.markdown("- ❌ Email notifications (system)")
+    st.markdown("- ❌ Manual data entry (sync)")
 
 with col2:
     st.markdown("**Steps Automated:**")
-    st.markdown("- ✅ AI-powered classification")
-    st.markdown("- ✅ Real-time inventory API")
-    st.markdown("- ✅ Automated fulfillment")
-    st.markdown("- ✅ System-to-system sync")
+    st.markdown("- ✅ AI-powered order classification")
+    st.markdown("- ✅ Real-time inventory API calls")
+    st.markdown("- ✅ Automated fulfillment routing")
+    st.markdown("- ✅ System-to-system data sync")
+    st.markdown("- ✅ Exception-only human review")
 
 # Implementation Roadmap
 st.markdown("---")
